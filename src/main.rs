@@ -33,11 +33,38 @@ fn date_offset(date: Option<String>) -> String {
     (squared % 10_000).to_string() // last 4 digits of squared date
 }
 
+fn get_base_ord(byte: u8) -> u8 {
+    if byte >= 'a' as u8 { return 97 }; // lower case
+    if byte >= 'A' as u8 { return 65 }; // uppper case
+    32 // default for punctuation
+}
+
+fn rotate(byte: u8, places: u8) -> u8 {
+    let mut result = byte;
+
+    if byte.is_ascii() && byte <= 'z' as u8 { // 122 is 'z', highest possible ord
+        let modulo = |a, b| { ((a % b) + b) % b };
+
+        let base_ord = get_base_ord(byte);
+        let rotation = (byte - base_ord) + places;
+        let scale = if byte.is_ascii_alphabetic() { 26 } else { 32 };
+
+        result = modulo(rotation, scale) + base_ord;
+    }
+
+    result
+}
+
 fn main() {
     // TODO: get optional user input
     let key = key_offset(None);
     let date = date_offset(None);
-    println!("{} - {}", key, date)
+
+    let before = 'a';
+    let after = rotate(before as u8, 25);
+
+    println!("{} - {}", key, date);
+    println!("{} - {}", before, after as char);
 }
 
 
